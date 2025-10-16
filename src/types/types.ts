@@ -3,7 +3,7 @@ import type { Dispatch, SetStateAction } from "react";
 export type Painting = {
   id: string;
   namePainting: string;
-  originalTittle: string;
+  originalTitle: string;
   datePainting: string;
   imagePainting: string;
   style: string;
@@ -27,7 +27,6 @@ export interface AppSidebarProps {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
-
 
 export interface Links {
   label: string;
