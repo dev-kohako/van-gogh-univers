@@ -1,16 +1,18 @@
 "use client";
 
+import { motion } from "framer-motion";
 import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
-import { motion } from "motion/react";
-import Link from "next/link";
-import type { SetStateAction } from "react";
+
+import type { Painting } from "@/types/types";
+import { data_painting } from "../../../public/data/data.json";
+import { usePaintings } from "./usePantings";
+
 import { Button } from "@/components/ui/button";
-import { FocusContainer, FocusItem } from "@/components/ui/focus-cards";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -20,55 +22,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { usePaintings } from "./usePantings";
+import { PaintingCard } from "./components/PaintingCard";
+import { EmptySection } from "./components/EmptySection";
+
+const paintings: Painting[] = (data_painting || [])
+  .filter((p) => p.width && p.height && p.imagePainting)
+  .map((p) => ({
+    ...p,
+    imagePainting: `/assets/paintings/${p.imagePainting}`,
+    alt: `Obra "${p.namePainting}" (${p.datePainting}) por Van Gogh.`,
+  }));
 
 export default function PaintingsPage() {
-  const {
-    currentItems,
-    currentPage,
-    itemsPerPage,
-    searchTerm,
-    order,
-    totalPages,
-    sortBy,
-    setCurrentPage,
-    setItemsPerPage,
-    setOrder,
-    setSearchTerm,
-    setSortBy,
-    imageVariants,
-    overlayVariants,
-    descriptionTitleVariants,
-    descriptionDateVariants,
-    buttonVariants,
-    titleVariants,
-    dateVariants,
-    containerRef,
-    activeId,
-    handleClick,
-    isLoading,
-    MotionImage,
-  } = usePaintings();
-
-  if (isLoading) {
-    return (
-      <main className="flex items-center justify-center min-h-screen bg-background">
-        <p
-          aria-live="polite"
-          className="text-lg text-muted-foreground animate-pulse"
-        >
-          Carregando pinturas...
-        </p>
-      </main>
-    );
-  }
-
+  const { currentItems, pagination, filter, sort, ui } = usePaintings({
+    paintings: paintings,
+    initialItemsPerPage: 6,
+  });
   return (
     <motion.main
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="px-[7.5%] md:px-[5%] min-[1350px]:!px-0 my-20 md:my-14 w-full max-w-7xl mx-auto"
+      className="px-[7.5%] min-[1350px]:!px-0 my-20 md:my-14 w-full max-w-7xl mx-auto"
     >
       <header className="mb-10 md:pl-10 text-center">
         <motion.h1
@@ -92,12 +67,18 @@ export default function PaintingsPage() {
         </motion.p>
       </header>
 
+      <div className="sr-only" aria-live="polite" role="status">
+        {filter.searchTerm
+          ? `${currentItems.length} resultados encontrados para "${filter.searchTerm}"`
+          : "Galeria de pinturas carregada."}
+      </div>
+
       <motion.section
         aria-label="Filtros de pesquisa"
         initial={{ opacity: 0, y: 60 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between md:pl-10"
+        className="mb-5 md:pl-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
       >
         <div className="flex flex-col gap-1 w-full sm:max-w-xs">
           <Label htmlFor="search">Buscar pintura</Label>
@@ -105,12 +86,9 @@ export default function PaintingsPage() {
             id="search"
             type="search"
             placeholder="Digite o nome da pintura..."
-            value={searchTerm}
-            onChange={(e: { target: { value: SetStateAction<string> } }) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="pt-1"
+            value={filter.searchTerm}
+            onChange={(e) => filter.setSearchTerm(e.target.value)}
+            className="pt-2"
           />
         </div>
 
@@ -118,37 +96,32 @@ export default function PaintingsPage() {
           <div className="flex flex-col gap-1 w-full sm:w-24">
             <Label htmlFor="sortBy">Ordenar por</Label>
             <Select
-              value={sortBy}
-              onValueChange={(value: "nome" | "data") => {
-                setSortBy(value);
-                setCurrentPage(1);
-              }}
+              value={sort.sortBy}
+              onValueChange={(value) =>
+                sort.setSortBy(value as "name" | "date")
+              }
             >
               <SelectTrigger id="sortBy" className="w-full pb-1">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="nome">Nome</SelectItem>
-                <SelectItem value="data">Data</SelectItem>
+                <SelectItem value="name" className="font-josefin pb-1">Nome</SelectItem>
+                <SelectItem value="date" className="font-josefin pb-1">Data</SelectItem>
               </SelectContent>
             </Select>
           </div>
-
           <div className="flex flex-col gap-1 w-full sm:w-34">
             <Label htmlFor="order">Ordem</Label>
             <Select
-              value={order}
-              onValueChange={(value: "ascendente" | "descendente") => {
-                setOrder(value);
-                setCurrentPage(1);
-              }}
+              value={sort.order}
+              onValueChange={(value) => sort.setOrder(value as "asc" | "desc")}
             >
               <SelectTrigger id="order" className="w-full pb-1">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ascendente">Ascendente</SelectItem>
-                <SelectItem value="descendente">Descendente</SelectItem>
+                <SelectItem value="asc" className="font-josefin pb-1">Ascendente</SelectItem>
+                <SelectItem value="desc" className="font-josefin pb-1">Descendente</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -163,124 +136,33 @@ export default function PaintingsPage() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="mx-auto md:pl-10"
         >
-          <FocusContainer>
-            {(hovered, setHovered) => (
-              <motion.ul
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 list-none"
-                ref={containerRef}
-              >
-                {currentItems.map((photo, i) => (
-                  <li key={photo.id}>
-                    <FocusItem
-                      index={i}
-                      hovered={hovered}
-                      setHovered={setHovered}
-                      className="rounded-lg pointer-events-none shadow-md"
-                    >
-                      <motion.article
-                        aria-labelledby={`painting-${photo.id}`}
-                        className="group relative block w-full border overflow-hidden rounded-lg bg-transparent transition-all pointer-events-auto"
-                        initial="initial"
-                        animate={activeId === photo.id ? "hover" : "initial"}
-                        whileHover="hover"
-                        onClick={() => handleClick(photo.id)}
-                      >
-                        <motion.figure className="m-0 relative">
-                          <MotionImage
-                            src={photo.src}
-                            alt={photo.alt}
-                            width={photo.width}
-                            height={photo.height}
-                            priority={i < 6}
-                            sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
-                            className="h-64 w-full object-cover opacity-0 transition-opacity duration-500 ease-in-out"
-                            onLoadingComplete={(img) =>
-                              img.classList.remove("opacity-0")
-                            }
-                            variants={imageVariants}
-                          />
-
-                          <motion.figcaption
-                            variants={overlayVariants}
-                            className="absolute inset-0 flex flex-col items-center justify-center bg-black/70"
-                          >
-                            <motion.span
-                              id={`painting-${photo.id}`}
-                              variants={titleVariants}
-                              className="px-12 text-center text-lg font-semibold text-zinc-50"
-                            >
-                              {photo.title}
-                            </motion.span>
-
-                            <motion.p
-                              variants={dateVariants}
-                              className="text-sm text-muted/65 dark:text-muted-foreground"
-                            >
-                              {photo.date}
-                            </motion.p>
-
-                            <motion.div variants={buttonVariants}>
-                              <Button
-                                size="sm"
-                                asChild
-                                aria-label={`Ver detalhes de ${photo.title}`}
-                                className="mt-2 text-sm bg-background hover:bg-background/90 dark:bg-foreground dark:hover:bg-foreground/90 text-foreground dark:text-background "
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <Link
-                                  href={`/paintingsDetails/${photo.id}`}
-                                  aria-label={`Ver detalhes de ${photo.title}`}
-                                >
-                                  Ver detalhes
-                                </Link>
-                              </Button>
-                            </motion.div>
-                          </motion.figcaption>
-                        </motion.figure>
-
-                        <div className="px-3 py-2 text-center">
-                          <motion.h2
-                            variants={descriptionTitleVariants}
-                            className="text-base font-medium truncate"
-                          >
-                            {photo.title}
-                          </motion.h2>
-                          <motion.p
-                            variants={descriptionDateVariants}
-                            className="text-sm text-muted-foreground -mb-1"
-                          >
-                            {photo.date}
-                          </motion.p>
-                        </div>
-                      </motion.article>
-                    </FocusItem>
-                  </li>
-                ))}
-              </motion.ul>
-            )}
-          </FocusContainer>
+          <ul
+            ref={ui.containerRef}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 list-none"
+          >
+            {currentItems.map((photo, i) => (
+              <li key={photo.id}>
+                <PaintingCard
+                  photo={photo}
+                  isActive={ui.activeId === photo.id}
+                  onCardClick={ui.handleItemClick}
+                  index={i}
+                />
+              </li>
+            ))}
+          </ul>
 
           <footer className="mt-10 flex flex-col items-center justify-between gap-4 sm:flex-row w-full">
-            <div className="flex items-center gap-2">
-              <Label
-                htmlFor="rows-per-page"
-                className="text-sm font-medium pt-0.5"
-              >
-                Itens por página
-              </Label>
+            <div className="hidden sm:flex items-center gap-2">
+              <Label htmlFor="rows-per-page">Itens por página</Label>
               <Select
-                value={itemsPerPage}
-                onValueChange={(value) => {
-                  setItemsPerPage(value);
-                  setCurrentPage(1);
-                }}
+                value={String(pagination.itemsPerPage)}
+                onValueChange={(value) =>
+                  pagination.setItemsPerPage(Number(value))
+                }
               >
-                <SelectTrigger
-                  id="rows-per-page"
-                  size="sm"
-                  className="w-20 font-inter text-xs font-semibold"
-                >
-                  <SelectValue placeholder={itemsPerPage} />
+                <SelectTrigger id="rows-per-page" className="w-20">
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent side="top">
                   {[6, 12, 18, 24].map((n) => (
@@ -299,73 +181,50 @@ export default function PaintingsPage() {
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => setCurrentPage(1)}
-                disabled={currentPage === 1}
-                className="hidden h-8 w-8 p-0 sm:flex"
+                onClick={() => pagination.setCurrentPage(1)}
+                disabled={pagination.currentPage === 1}
               >
-                <span className="sr-only">Ir para a primeira página</span>
-                <ChevronsLeft />
+                <ChevronsLeft className="h-4 w-4 mb-0.5" />
               </Button>
-
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-                disabled={currentPage === 1}
-                className="h-8 w-8 p-0"
+                onClick={() => pagination.setCurrentPage((p) => p - 1)}
+                disabled={pagination.currentPage === 1}
               >
-                <span className="sr-only">Página anterior</span>
-                <ChevronLeft />
+                <ChevronLeft className="h-4 w-4 mb-0.5" />
               </Button>
-
-              <span
-                aria-live="polite"
-                className="px-3 text-sm font-medium text-muted-foreground"
-              >
-                Página {currentPage} de {totalPages}
+              <span className="pt-1.5">
+                Página {pagination.currentPage} de {pagination.totalPages}
               </span>
-
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() =>
-                  setCurrentPage((p) => Math.min(p + 1, totalPages))
-                }
-                disabled={currentPage === totalPages}
-                className="h-8 w-8 p-0"
+                onClick={() => pagination.setCurrentPage((p) => p + 1)}
+                disabled={pagination.currentPage === pagination.totalPages}
               >
-                <span className="sr-only">Próxima página</span>
-                <ChevronRight />
+                <ChevronRight className="h-4 w-4 mb-0.5" />
               </Button>
-
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => setCurrentPage(totalPages)}
-                disabled={currentPage === totalPages}
-                className="hidden h-8 w-8 p-0 sm:flex"
+                onClick={() => pagination.setCurrentPage(pagination.totalPages)}
+                disabled={pagination.currentPage === pagination.totalPages}
               >
-                <span className="sr-only">Ir para a última página</span>
-                <ChevronsRight />
+                <ChevronsRight className="h-4 w-4 mb-0.5" />
               </Button>
             </nav>
           </footer>
         </motion.section>
       ) : (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
-          className="flex items-center justify-center w-full h-140"
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          role="region"
+          aria-labelledby="empty-gallery-title"
         >
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
-            className="h-fit pl-10 text-muted-foreground"
-          >
-            Nenhuma pintura encontrada.
-          </motion.p>
+          <EmptySection filter={filter} />
         </motion.div>
       )}
     </motion.main>
