@@ -39,17 +39,3 @@ export interface SidebarContextProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   animate: boolean;
 }
-
-export type Photo = {
-  id: string;
-  src: string;
-  width: number;
-  height: number;
-  alt: string;
-  title: string;
-  date: string;
-  originalTitle: string;
-  local: string;
-  materials: string;
-  aspectRatio: string;
-};

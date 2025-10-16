@@ -6,6 +6,7 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  Palette,
 } from "lucide-react";
 
 import type { Painting } from "@/types/types";
@@ -23,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PaintingCard } from "./components/PaintingCard";
-import { EmptySection } from "./components/EmptySection";
+import { EmptySection } from "@/components/empty-section";
 
 const paintings: Painting[] = (data_painting || [])
   .filter((p) => p.width && p.height && p.imagePainting)
@@ -224,7 +225,13 @@ export default function PaintingsPage() {
           role="region"
           aria-labelledby="empty-gallery-title"
         >
-          <EmptySection filter={filter} />
+          <EmptySection
+            icon={<Palette aria-hidden="true" className="w-16 h-16" />}
+            title="Nenhuma Pintura Encontrada"
+            description={`Parece que não há obras que correspondam à sua busca.\nTente ajustar os filtros ou limpar a pesquisa`}
+            buttonText="Limpar Busca"
+            onClear={() => filter.setSearchTerm("")}
+          />
         </motion.div>
       )}
     </motion.main>
