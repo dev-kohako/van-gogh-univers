@@ -1,36 +1,64 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { PaintingPalette } from "./PaintingPalette";
+import React from "react";
 import { PaintingDetailsProps } from "@/types/paintingDetails.type";
+import { PaintingPalette } from "./PaintingPalette/PaintingPalette";
+import { capitalizeFirst } from "@/lib/utils";
 
 export function PaintingDetails({ painting }: PaintingDetailsProps) {
+  const details = [
+    { label: "Título original:", value: painting.originalTitle },
+    { label: "Data:", value: painting.datePainting },
+    { label: "Local:", value: painting.local },
+    { label: "Materiais:", value: painting.materials },
+    { label: "Estilo:", value: painting.style },
+    { label: "Dimensões:", value: painting.physicalDimensions },
+    { label: "Período:", value: painting.period },
+    { label: "Gênero:", value: painting.genre },
+  ];
+
+  const colors = [
+    painting.color1,
+    painting.color2,
+    painting.color3,
+    painting.color4,
+    painting.color5,
+  ].filter(Boolean) as string[];
+
   return (
     <motion.article
+      aria-label="Detalhes da pintura"
       initial={{ opacity: 0, x: 30 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-      className="space-y-3 text-lg leading-relaxed"
+      className="space-y-6 text-lg leading-relaxed"
     >
-      <p className="text-lg lg:text-xl font-bold text-primary">Título original: <span className="font-light">{painting.originalTittle}</span></p>
-      <p className="text-lg lg:text-xl font-bold text-primary">Data: <span className="font-light">{painting.datePainting}</span></p>
-      <p className="text-lg lg:text-xl font-bold text-primary">Local: <span className="font-light">{painting.local}</span></p>
-      <p className="text-lg lg:text-xl font-bold text-primary">Materiais: <span className="font-light">{painting.materials}</span></p>
-      <p className="text-lg lg:text-xl font-bold text-primary">Estilo: <span className="font-light">{painting.style}</span></p>
-      <p className="text-lg lg:text-xl font-bold text-primary">Dimensões: <span className="font-light">{painting.physicalDimensions}</span></p>
-      <p className="text-lg lg:text-xl font-bold text-primary">Período: <span className="font-light">{painting.period}</span></p>
-      <p className="text-lg lg:text-xl font-bold text-primary">Gênero: <span className="font-light">{painting.genre}</span></p>
-      <p className="text-muted-foreground mt-6 text-base pt-4 border-t">{painting.description}</p>
+      <dl>
+        {details.map((item) =>
+          item.value ? (
+            <div key={item.label} className="flex items-baseline text-lg lg:text-xl gap-2 space-y-4">
+              <dt className="font-bold text-nowrap">{item.label}</dt>
+              <dd className="font-light ">{capitalizeFirst(item.value)}</dd>
+            </div>
+          ) : null
+        )}
+      </dl>
 
-      <PaintingPalette
-        colors={[
-          painting.color1,
-          painting.color2,
-          painting.color3,
-          painting.color4,
-          painting.color5,
-        ].filter(Boolean)}
-      />
+      {painting.description && (
+        <p className="text-muted-foreground text-base pt-4 border-t">
+          {painting.description}
+        </p>
+      )}
+
+      {colors.length > 0 && (
+        <section aria-labelledby="palette-heading">
+          <h2 id="palette-heading" className="sr-only">
+            Paleta de Cores Principal
+          </h2>
+          <PaintingPalette colors={colors} />
+        </section>
+      )}
     </motion.article>
   );
 }
