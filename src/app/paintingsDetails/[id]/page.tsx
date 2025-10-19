@@ -1,53 +1,82 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { usePaintingDetails } from "./usePaintingDetails";
-import { Painting3DViewer } from "./components/Painting3DViewer";
-import { PaintingPageSkeleton } from "./components/PaintingPageSkeleton";
-import { PaintingHeader } from "./components/PaintingHeader";
+import { Painting3DViewer } from "./components/Painting3DViewer/Painting3DViewer";
 import { PaintingImage } from "./components/PaintingImage";
 import { PaintingDetails } from "./components/PaintingDetails";
 import { FullscreenImageViewer } from "./components/FullscreenImageViewer";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+import { Painting } from "@/types/types";
+import { data_painting } from "../../../../public/data/data.json";
+import { Button } from "@/components/ui/button";
+import { Undo2 } from "lucide-react";
+import { Image } from "lucide-react";
+import { EmptySection } from "@/components/empty-section";
+
+function usePainting(id: string): Painting | undefined {
+  return useMemo(() => {
+    const foundPainting = (data_painting || []).find((p) => p.id === id);
+
+    if (!foundPainting) {
+      return undefined;
+    }
+
+    return {
+      ...foundPainting,
+      imagePainting: `/assets/paintings/${foundPainting.imagePainting}`,
+      alt: `Obra "${foundPainting.namePainting}" (${foundPainting.datePainting}) por Van Gogh.`,
+    };
+  }, [id]);
+}
+
+function useBodyScrollLock(isLocked: boolean) {
+  useEffect(() => {
+    if (isLocked) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isLocked]);
+}
+function BackButton() {
+  const router = useRouter();
+  return (
+    <motion.div
+      whileHover={{ x: 12, transition: { duration: 0.2 } }}
+      className="w-fit"
+    >
+      <Button
+        onClick={() => router.back()}
+        variant="ghost"
+        className="flex items-center gap-1 p-2 pt-3 -ml-2"
+      >
+        <Undo2 className="!w-5 !h-5 mb-1.5" aria-hidden="true" />
+        <span className="text-lg">Voltar</span>
+      </Button>
+    </motion.div>
+  );
+}
 
 export default function PaintingsDetailsPage() {
   const { id } = useParams() as { id: string };
+
+  const painting = usePainting(id);
+
   const {
-    painting,
-    isLoading,
-    error,
     prevPainting,
     nextPainting,
     show3D,
     setShow3D,
     isFullscreen,
     setIsFullscreen,
-  } = usePaintingDetails(id);
+  } = usePaintingDetails(painting);
 
-  useEffect(() => {
-    if (show3D || isFullscreen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [show3D, isFullscreen]);
-
-  if (isLoading) {
-    return <PaintingPageSkeleton />;
-  }
-
-  if (error || !painting) {
-    return (
-      <main className="flex items-center justify-center min-h-screen">
-        <p className="text-lg text-red-500">{error ?? "Erro ao carregar."}</p>
-      </main>
-    );
-  }
+  useBodyScrollLock(show3D || isFullscreen);
 
   return (
     <>
@@ -55,34 +84,62 @@ export default function PaintingsDetailsPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative px-[7.5%] md:px-[5%] min-[1350px]:!px-0 my-20 md:my-14 w-full max-w-7xl flex justify-center flex-col items-center md:ml-10"
+        className="relative my-14 md:my-20 w-full max-w-7xl mx-auto px-6 md:px-8 flex flex-col"
       >
-        <PaintingHeader painting={painting} />
-
-        <section
-          aria-labelledby="painting-title"
-          className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start"
+        <motion.header
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="w-full mb-4 sm:mb-8 text-center md:text-left"
         >
-          <PaintingImage
-            prevPainting={prevPainting}
-            nextPainting={nextPainting}
-            painting={painting}
-            onShow3D={() => setShow3D(true)}
-            onOpenFullscreen={() => setIsFullscreen(true)}
+          <div className="mb-6">
+            <BackButton />
+          </div>
+
+          {painting && (
+            <h1
+              id="painting-title"
+              className="text-4xl md:text-7xl font-extrabold tracking-tight"
+            >
+              {painting.namePainting}
+            </h1>
+          )}
+        </motion.header>
+
+        {painting ? (
+          <section
+            aria-labelledby="painting-title"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start"
+          >
+            <PaintingImage
+              prevPainting={prevPainting}
+              nextPainting={nextPainting}
+              painting={painting}
+              onShow3D={() => setShow3D(true)}
+              onOpenFullscreen={() => setIsFullscreen(true)}
+            />
+            <PaintingDetails painting={painting} />
+          </section>
+        ) : (
+          <EmptySection
+            icon={<Image aria-hidden="true" className="h-16 w-16" />}
+            title="Nenhuma Pintura Encontrada"
+            description="Sem obras no momento."
+            onClear={() => window.location.reload()}
+            buttonText="Recarregar Página"
           />
-          <PaintingDetails painting={painting} />
-        </section>
+        )}
       </motion.main>
 
       <AnimatePresence>
-        {isFullscreen && (
+        {isFullscreen && painting && (
           <FullscreenImageViewer
             key={painting.id || painting.namePainting}
             painting={painting}
             onClose={() => setIsFullscreen(false)}
           />
         )}
-        {show3D && (
+        {show3D && painting && (
           <Painting3DViewer
             imageUrl={painting.imagePainting}
             title={painting.namePainting}
