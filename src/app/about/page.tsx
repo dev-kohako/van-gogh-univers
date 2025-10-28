@@ -23,7 +23,7 @@ export default function AboutPage() {
         >
           <h1
             id="about-title"
-            className="text-4xl md:text-6xl font-bold text-foreground drop-shadow-md"
+            className="text-5xl font-bold md:text-7xl tracking-tight"
           >
             Sobre o Van Gogh Univers
           </h1>
