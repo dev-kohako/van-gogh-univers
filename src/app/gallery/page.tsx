@@ -36,7 +36,7 @@ export default function GalleryPage() {
         aria-hidden="true"
       />
 
-      <header className="mb-8 text-center">
+      <header className="mb-8 text-center md:pl-10 2xl:pl-5">
         <motion.h1
           initial={{ opacity: 0, x: 60 }}
           animate={{ opacity: 1, x: 0 }}
@@ -62,7 +62,7 @@ export default function GalleryPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeInOut" }}
           aria-labelledby="gallery-title"
-          className="mx-auto w-full max-w-7xl"
+          className="mx-auto w-full max-w-7xl md:pl-10 2xl:pl-5"
         >
           <LightGallery
             speed={500}

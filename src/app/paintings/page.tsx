@@ -46,7 +46,7 @@ export default function PaintingsPage() {
       transition={{ duration: 0.8, ease: "easeOut" }}
       className="px-[7.5%] min-[1350px]:!px-0 my-20 md:my-14 w-full max-w-7xl mx-auto"
     >
-      <header className="mb-10 md:pl-10 text-center">
+      <header className="mb-10 md:pl-10 2xl:pl-5 text-center">
         <motion.h1
           id="gallery-title"
           initial={{ opacity: 0, x: 100 }}
@@ -79,7 +79,7 @@ export default function PaintingsPage() {
         initial={{ opacity: 0, y: 60 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="mb-5 md:pl-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
+        className="mb-5 md:pl-10 2xl:pl-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
       >
         <div className="flex flex-col gap-1 w-full sm:max-w-xs">
           <Label htmlFor="search">Buscar pintura</Label>
@@ -135,7 +135,7 @@ export default function PaintingsPage() {
           initial={{ opacity: 0, y: 60 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="mx-auto md:pl-10"
+          className="mx-auto md:pl-10 2xl:pl-5"
         >
           <ul
             ref={ui.containerRef}
