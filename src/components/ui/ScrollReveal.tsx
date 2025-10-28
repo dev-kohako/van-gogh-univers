@@ -1,14 +1,16 @@
 "use client";
 
-import { MarginType, motion, MotionProps, useInView } from "framer-motion";
+import { motion, MotionProps, useInView } from "framer-motion";
 import { useRef, useMemo } from "react";
 import { cn } from "@/lib/utils";
+
+type RootMargin = `${number}px` | `${number}%`;
 
 interface ScrollRevealProps extends MotionProps {
   children: React.ReactNode;
   className?: string;
   once?: boolean;
-  rootMargin?: MarginType;
+  rootMargin?: RootMargin;
 }
 
 export function ScrollReveal({
