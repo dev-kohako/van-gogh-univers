@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Undo2 } from "lucide-react";
 import { Image } from "lucide-react";
 import { EmptySection } from "@/components/empty-section";
+import { BackButton } from "@/components/ui/back-button";
 
 function usePainting(id: string): Painting | undefined {
   return useMemo(() => {
@@ -43,24 +44,6 @@ function useBodyScrollLock(isLocked: boolean) {
     };
   }, [isLocked]);
 }
-function BackButton() {
-  const router = useRouter();
-  return (
-    <motion.div
-      whileHover={{ x: 12, transition: { duration: 0.2 } }}
-      className="w-fit"
-    >
-      <Button
-        onClick={() => router.back()}
-        variant="ghost"
-        className="flex items-center gap-1 p-2 pt-3 -ml-2"
-      >
-        <Undo2 className="!w-5 !h-5 mb-1.5" aria-hidden="true" />
-        <span className="text-lg">Voltar</span>
-      </Button>
-    </motion.div>
-  );
-}
 
 export default function PaintingsDetailsPage() {
   const { id } = useParams() as { id: string };
@@ -84,7 +67,7 @@ export default function PaintingsDetailsPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative my-14 md:my-20 w-full max-w-7xl mx-auto px-6 md:px-8 flex flex-col"
+        className="relative px-[7.5%] 2xl:px-0 my-14 md:my-20 w-full max-w-7xl mx-auto md:pl-10 2xl:pl-4 flex flex-col"
       >
         <motion.header
           initial={{ opacity: 0, y: -30 }}
@@ -93,7 +76,7 @@ export default function PaintingsDetailsPage() {
           className="w-full mb-4 sm:mb-8 text-center md:text-left"
         >
           <div className="mb-6">
-            <BackButton />
+            <BackButton redirect="/paintings" />
           </div>
 
           {painting && (
