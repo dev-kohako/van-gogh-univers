@@ -3,9 +3,9 @@
 import { motion } from "framer-motion";
 import React, { memo, useMemo } from "react";
 import { InfoGridProps } from "@/types/about.type";
-import { vanGoghInfo } from "../../../../../public/data/vanGoghInfos";
+import { vanGoghInfo } from "../../../../public/data/vanGoghInfos";
 
-function formatLabel(label: string) {
+export function formatLabel(label: string) {
   return label
     .replace(/([A-Z])/g, " $1")
     .replace(/_/g, " ")
