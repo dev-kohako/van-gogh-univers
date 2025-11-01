@@ -1,13 +1,5 @@
 import { useMemo, useState, useEffect, useRef } from "react";
-import type { Painting } from "@/types/types";
-
-type SortOrder = "asc" | "desc";
-type SortBy = "name" | "date";
-
-interface UsePaintingsProps {
-  paintings: Painting[];
-  initialItemsPerPage?: number;
-}
+import { SortBy, SortOrder, UsePaintingsProps } from "@/types/paiting.type";
 
 export function usePaintings({
   paintings,
