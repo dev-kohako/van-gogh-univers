@@ -1,7 +1,7 @@
 "use client";
 
 import { useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, useTexture, Plane } from "@react-three/drei";
+import { OrbitControls, useTexture } from "@react-three/drei";
 import { useMemo, useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 import { Vector3 } from "three";
@@ -22,7 +22,6 @@ function SceneSetupAndAnimation({
   const { camera, scene } = useThree();
 
   const startPos = useMemo(() => new Vector3(3, 6, 14), []);
-  const midPos = useMemo(() => new Vector3(-1, 3, 9), []);
   const endPos = useMemo(
     () => new Vector3(targetPosition.x, targetPosition.y + 0.5, 6.5),
     [targetPosition]

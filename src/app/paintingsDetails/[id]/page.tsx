@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { usePaintingDetails } from "./usePaintingDetails";
 import { Painting3DViewer } from "./components/Painting3DViewer/Painting3DViewer";
 import { PaintingImage } from "./components/PaintingImage";
@@ -10,8 +10,6 @@ import { FullscreenImageViewer } from "./components/FullscreenImageViewer";
 import { useEffect, useMemo } from "react";
 import { Painting } from "@/types/types";
 import { data_painting } from "../../../../public/data/data.json";
-import { Button } from "@/components/ui/button";
-import { Undo2 } from "lucide-react";
 import { Image } from "lucide-react";
 import { EmptySection } from "@/components/empty-section";
 import { BackButton } from "@/components/ui/back-button";
