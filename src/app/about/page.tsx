@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { VanGogh3DCard } from "./components/VanGogh3DCard/VanGogh3DCard";
+import { VanGogh3DCard } from "./components/VanGogh3DCard";
 import { ScrollReveal } from "../../components/ui/ScrollReveal";
 
 export default function AboutPage() {

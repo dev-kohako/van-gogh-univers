@@ -10,8 +10,8 @@ export type PaintingSceneProps = Omit<Painting3DViewerProps, "onClose" | "title"
 
 export interface PaintingImageProps {
   painting: Painting;
-  prevPainting: PaintingLink;
-  nextPainting: PaintingLink;
+  prevPainting: PaintingLink | null;
+  nextPainting: PaintingLink | null;
   onShow3D: () => void;
   onOpenFullscreen: () => void;
 }
