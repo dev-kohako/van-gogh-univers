@@ -20,14 +20,14 @@ export function PaintingCarousel({ paintings }: PaintingCarouselProps) {
       speed={1200}
       slidesPerView={2}
       coverflowEffect={{
-        rotate: 50,
+        rotate: 30,
         stretch: 0,
-        depth: 100,
+        depth: 150,
         modifier: 1,
         slideShadows: true,
       }}
       modules={[EffectCoverflow, Autoplay]}
-      className="w-[90vw] max-w-7xl my-5 mask-x-from-90% mask-x-to-97% z-40"
+      className="w-[90vw] max-w-7xl my-5 mask-x-from-90% mask-x-to-97% z-40 overflow-visible"
     >
       {paintings.map((painting, i) => (
         <SwiperSlide
